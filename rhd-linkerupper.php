@@ -110,7 +110,6 @@ add_action( 'post_updated', 'rhd_add_update_cpt_post', 10, 3 );
  */
 function rhd_delete_cpt_post( $post_id )
 {
-	error_log('delete called');
 	if ( get_post_type( $post_id ) == RHD_LU_CUSTOM_TYPE ) {
 		$term_id = get_post_meta( $post_id, '_lu_' . RHD_LU_TAX . '_id', true );
 
