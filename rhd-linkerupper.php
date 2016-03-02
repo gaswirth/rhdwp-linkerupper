@@ -4,18 +4,54 @@
  * Description: Automatically creates, updates, and deletes taxonomy terms to match linked posts (including pages and custom post types). Set CPT and taxonomy definitions by editing plugin.
  * Author: Roundhouse Designs
  * Author URI: https://roundhouse-designs.com
- * Version: 0.1
+ * Version: 0.9
 **/
 
-define( 'RHD_LU_TAX', 'location' );
-define( 'RHD_LU_POST_TYPE', 'store' );
+define( 'RHD_LU_TAX', 'taxonomy' );
+define( 'RHD_LU_CUSTOM_TYPE', 'custom_post_type' );
+define( 'RHD_LU_TAX_POST_TYPE', 'main_post_type' );
 
 
 /**
- * rhd_add_update_store function.
+ * rhd_lu_tax_hide_ui function.
  *
- * Adds a RHD_LU_TAX taxonomy term to match a new RHD_LU_POST_TYPE post,
- *  or updates the term to match the updated store.
+ * Sets RHD_LU_TAX 'show_ui' to false.
+ *
+ * @access public
+ * @return void
+ */
+function rhd_lu_tax_hide_ui()
+{
+	$tax_args = get_taxonomy( RHD_LU_TAX );
+
+	$tax_args->show_ui = false;
+
+	register_taxonomy( RHD_LU_TAX, RHD_LU_TAX_POST_TYPE, (array) $tax_args );
+}
+add_action( 'init', 'rhd_lu_tax_hide_ui', 11 );
+
+
+/**
+ * rhd_add_lu_tax_box function.
+ *
+ * Displays the LU_TAX meta box on the edit screen, since show_ui has been disabled.
+ *
+ * @access public
+ * @return void
+ */
+function rhd_add_lu_tax_box()
+{
+	$tax = get_taxonomy( RHD_LU_TAX );
+	add_meta_box( RHD_LU_TAX . '_box', $tax->labels->name, 'post_categories_meta_box', 'post', 'side', null, array( 'taxonomy' => RHD_LU_TAX ) );
+}
+add_action( 'add_meta_boxes', 'rhd_add_lu_tax_box' );
+
+
+/**
+ * rhd_add_update_cpt_post function.
+ *
+ * Adds a RHD_LU_TAX taxonomy term to match a new `RHD_LU_CUSTOM_TYPE` post,
+ *  or updates the term to match the updated `RHD_LU_CUSTOM_TYPE` post.
  *
  * @access public
  * @param mixed $post_id
@@ -23,7 +59,7 @@ define( 'RHD_LU_POST_TYPE', 'store' );
  * @param mixed $post_before
  * @return void
  */
-function rhd_add_update_store( $post_id, $post_after, $post_before )
+function rhd_add_update_cpt_post( $post_id, $post_after, $post_before )
 {
 	$title_after = $post_after->post_title;
 	$slug_after = $post_after->post_name;
@@ -62,19 +98,19 @@ function rhd_add_update_store( $post_id, $post_after, $post_before )
 		}
 	}
 }
-add_action( 'post_updated', 'rhd_add_update_store', 10, 3 );
+add_action( 'post_updated', 'rhd_add_update_cpt_post', 10, 3 );
 
 
 /**
- * rhd_delete_store function.
+ * rhd_delete_cpt_post function.
  *
  * @access public
  * @param mixed $post_id
  * @return void
  */
-function rhd_delete_store( $post_id )
+function rhd_delete_cpt_post( $post_id )
 {
-	if ( get_post_type( $post_id ) == RHD_LU_POST_TYPE ) {
+	if ( get_post_type( $post_id ) == RHD_LU_CUSTOM_TYPE ) {
 		$term_id = get_post_meta( $post_id, '_lu_' . RHD_LU_TAX . '_id', true );
 
 		if ( $term_id ) {
@@ -82,14 +118,14 @@ function rhd_delete_store( $post_id )
 		}
 	}
 }
-add_action( 'before_delete_post', 'rhd_delete_store' );
-add_action( 'delete_post', 'rhd_delete_store' );
+add_action( 'before_delete_post', 'rhd_delete_cpt_post' );
+add_action( 'delete_post', 'rhd_delete_cpt_post' );
 
 
 /**
  * rhd_force_slug_update function.
  *
- * Forces recalculation of post slug on update if type RHD_LU_POST_TYPE
+ * Forces recalculation of post slug on update if type RHD_LU_CUSTOM_TYPE
  *
  * @access public
  * @param mixed $data
@@ -98,7 +134,7 @@ add_action( 'delete_post', 'rhd_delete_store' );
  */
 function rhd_force_slug_update( $data, $postarr )
 {
-	if ( ! in_array( $data['post_status'], array( 'draft', 'pending', 'auto-draft' ) ) && $data['post_type'] == RHD_LU_POST_TYPE ) {
+	if ( ! in_array( $data['post_status'], array( 'draft', 'pending', 'auto-draft' ) ) && $data['post_type'] == RHD_LU_CUSTOM_TYPE ) {
 		$data['post_name'] = sanitize_title( $data['post_title'] );
 	}
 
