@@ -4,7 +4,7 @@
  * Description: Automatically creates, updates, and deletes taxonomy terms to match linked posts (including pages and custom post types). Set CPT and taxonomy definitions by editing plugin.
  * Author: Roundhouse Designs
  * Author URI: https://roundhouse-designs.com
- * Version: 1.01
+ * Version: 1.1
 **/
 
 define( 'RHD_LU_TAX', 'taxonomy' );
@@ -122,27 +122,3 @@ function rhd_delete_cpt_post( $post_id )
 }
 add_action( 'before_delete_post', 'rhd_delete_cpt_post' );
 add_action( 'delete_post', 'rhd_delete_cpt_post' );
-
-
-/**
- * rhd_force_slug_update function.
- *
- * Forces recalculation of post slug on update if type RHD_LU_CUSTOM_TYPE
- *
- * @access public
- * @param mixed $data
- * @param mixed $postarr
- * @return void
- */
-function rhd_force_slug_update( $data, $postarr )
-{
-	if ( $data['post_type'] == RHD_LU_CUSTOM_TYPE )
-		return;
-
-	if ( ! in_array( $data['post_status'], array( 'draft', 'pending', 'auto-draft' ) ) ) {
-		$data['post_name'] = sanitize_title( $data['post_title'] );
-	}
-
-	return $data;
-}
-add_filter( 'wp_insert_post_data', 'rhd_force_slug_update', 11, 2 );
