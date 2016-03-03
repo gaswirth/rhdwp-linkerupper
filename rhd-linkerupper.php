@@ -13,6 +13,29 @@ define( 'RHD_LU_MAIN_POST_TYPE', 'main_post_type' );
 
 
 /**
+ * rhd_register_lu_tax function.
+ *
+ * @access public
+ * @return void
+ */
+function rhd_register_lu_tax()
+{
+	register_taxonomy( 'location', 'post', array(
+		'label' => 'Store Locations',
+		'labels' => array(
+			'name' => 'Store Locations',
+		),
+		'public' => true,
+		'show_admin_column' => true,
+		'show_in_nav_menus' => false,
+		'show_tagcloud' => false,
+		'show_ui' => true,
+		'hierarchical' => true
+	));
+}
+add_action( 'init', 'rhd_register_lu_tax' );
+
+/**
  * rhd_add_update_cpt_post function.
  *
  * Adds a RHD_LU_TAX taxonomy term to match a new `RHD_LU_CUSTOM_TYPE` post,
