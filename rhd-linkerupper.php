@@ -4,12 +4,12 @@
  * Description: Automatically creates, updates, and deletes taxonomy terms to match linked posts (including pages and custom post types). Set CPT and taxonomy definitions by editing plugin.
  * Author: Roundhouse Designs
  * Author URI: https://roundhouse-designs.com
- * Version: 1.0
+ * Version: 1.01
 **/
 
 define( 'RHD_LU_TAX', 'taxonomy' );
 define( 'RHD_LU_CUSTOM_TYPE', 'custom_post_type' );
-define( 'RHD_LU_TAX_POST_TYPE', 'main_post_type' );
+define( 'RHD_LU_MAIN_POST_TYPE', 'main_post_type' );
 
 
 /**
@@ -22,11 +22,9 @@ define( 'RHD_LU_TAX_POST_TYPE', 'main_post_type' );
  */
 function rhd_lu_tax_hide_ui()
 {
-	$tax_args = get_taxonomy( RHD_LU_TAX );
+	$tax_args =& get_taxonomy( RHD_LU_TAX );
 
 	$tax_args->show_ui = false;
-
-	register_taxonomy( RHD_LU_TAX, RHD_LU_TAX_POST_TYPE, (array) $tax_args );
 }
 add_action( 'init', 'rhd_lu_tax_hide_ui', 11 );
 
@@ -42,7 +40,7 @@ add_action( 'init', 'rhd_lu_tax_hide_ui', 11 );
 function rhd_add_lu_tax_box()
 {
 	$tax = get_taxonomy( RHD_LU_TAX );
-	add_meta_box( RHD_LU_TAX . '_box', $tax->labels->name, 'post_categories_meta_box', 'post', 'side', null, array( 'taxonomy' => RHD_LU_TAX ) );
+	add_meta_box( RHD_LU_TAX . '_box', $tax->labels->name, 'post_categories_meta_box', RHD_LU_MAIN_POST_TYPE, 'side', null, array( 'taxonomy' => RHD_LU_TAX ) );
 }
 add_action( 'add_meta_boxes', 'rhd_add_lu_tax_box' );
 
@@ -114,7 +112,7 @@ add_action( 'post_updated', 'rhd_add_update_cpt_post', 10, 3 );
 function rhd_delete_cpt_post( $post_id )
 {
 	if ( get_post_type( $post_id ) != RHD_LU_CUSTOM_TYPE )
-		return
+		return;
 
 	$term_id = get_post_meta( $post_id, '_lu_' . RHD_LU_TAX . '_id', true );
 
@@ -138,7 +136,7 @@ add_action( 'delete_post', 'rhd_delete_cpt_post' );
  */
 function rhd_force_slug_update( $data, $postarr )
 {
-	if ( $data['post_type'] != RHD_LU_CUSTOM_TYPE )
+	if ( $data['post_type'] == RHD_LU_CUSTOM_TYPE )
 		return;
 
 	if ( ! in_array( $data['post_status'], array( 'draft', 'pending', 'auto-draft' ) ) ) {
@@ -147,4 +145,4 @@ function rhd_force_slug_update( $data, $postarr )
 
 	return $data;
 }
-add_filter( 'wp_insert_post_data', 'rhd_force_slug_update', 99, 2 );
+add_filter( 'wp_insert_post_data', 'rhd_force_slug_update', 11, 2 );
