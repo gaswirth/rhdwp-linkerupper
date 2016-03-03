@@ -4,7 +4,7 @@
  * Description: Automatically creates, updates, and deletes taxonomy terms to match linked posts (including pages and custom post types). Set CPT and taxonomy definitions by editing plugin.
  * Author: Roundhouse Designs
  * Author URI: https://roundhouse-designs.com
- * Version: 1.11
+ * Version: 1.12
 **/
 
 define( 'RHD_LU_TAX', 'taxonomy' );
@@ -20,10 +20,10 @@ define( 'RHD_LU_MAIN_POST_TYPE', 'main_post_type' );
  */
 function rhd_register_lu_tax()
 {
-	register_taxonomy( 'location', 'post', array(
-		'label' => 'Store Locations',
+	register_taxonomy( RHD_LU_TAX, RHD_LU_MAIN_POST_TYPE, array(
+		'label' => 'Some Terms',
 		'labels' => array(
-			'name' => 'Store Locations',
+			'name' => 'Some Terms',
 		),
 		'public' => true,
 		'show_admin_column' => true,
