@@ -4,45 +4,12 @@
  * Description: Automatically creates, updates, and deletes taxonomy terms to match linked posts (including pages and custom post types). Set CPT and taxonomy definitions by editing plugin.
  * Author: Roundhouse Designs
  * Author URI: https://roundhouse-designs.com
- * Version: 1.1
+ * Version: 1.11
 **/
 
 define( 'RHD_LU_TAX', 'taxonomy' );
 define( 'RHD_LU_CUSTOM_TYPE', 'custom_post_type' );
 define( 'RHD_LU_MAIN_POST_TYPE', 'main_post_type' );
-
-
-/**
- * rhd_lu_tax_hide_ui function.
- *
- * Sets RHD_LU_TAX 'show_ui' to false.
- *
- * @access public
- * @return void
- */
-function rhd_lu_tax_hide_ui()
-{
-	$tax_args =& get_taxonomy( RHD_LU_TAX );
-
-	$tax_args->show_ui = false;
-}
-add_action( 'init', 'rhd_lu_tax_hide_ui', 11 );
-
-
-/**
- * rhd_add_lu_tax_box function.
- *
- * Displays the LU_TAX meta box on the edit screen, since show_ui has been disabled.
- *
- * @access public
- * @return void
- */
-function rhd_add_lu_tax_box()
-{
-	$tax = get_taxonomy( RHD_LU_TAX );
-	add_meta_box( RHD_LU_TAX . '_box', $tax->labels->name, 'post_categories_meta_box', RHD_LU_MAIN_POST_TYPE, 'side', null, array( 'taxonomy' => RHD_LU_TAX ) );
-}
-add_action( 'add_meta_boxes', 'rhd_add_lu_tax_box' );
 
 
 /**
@@ -122,3 +89,40 @@ function rhd_delete_cpt_post( $post_id )
 }
 add_action( 'before_delete_post', 'rhd_delete_cpt_post' );
 add_action( 'delete_post', 'rhd_delete_cpt_post' );
+
+
+/* ==========================================================================
+	DISABLED FUNCTIONALITY
+   ========================================================================== */
+
+/**
+ * rhd_lu_tax_hide_ui function.
+ *
+ * Sets RHD_LU_TAX 'show_ui' to false.
+ *
+ * @access public
+ * @return void
+ */
+function rhd_lu_tax_hide_ui()
+{
+	$tax_args =& get_taxonomy( RHD_LU_TAX );
+
+	$tax_args->show_ui = false;
+}
+// add_action( 'init', 'rhd_lu_tax_hide_ui', 11 );
+
+
+/**
+ * rhd_add_lu_tax_box function.
+ *
+ * Displays the LU_TAX meta box on the edit screen, since show_ui has been disabled.
+ *
+ * @access public
+ * @return void
+ */
+function rhd_add_lu_tax_box()
+{
+	$tax = get_taxonomy( RHD_LU_TAX );
+	add_meta_box( RHD_LU_TAX . '_box', $tax->labels->name, 'post_categories_meta_box', RHD_LU_MAIN_POST_TYPE, 'side', null, array( 'taxonomy' => RHD_LU_TAX ) );
+}
+// add_action( 'add_meta_boxes', 'rhd_add_lu_tax_box' );
