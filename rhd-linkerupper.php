@@ -61,6 +61,9 @@ add_action( 'add_meta_boxes', 'rhd_add_lu_tax_box' );
  */
 function rhd_add_update_cpt_post( $post_id, $post_after, $post_before )
 {
+	if ( get_post_type( $post_id ) != RHD_LU_CUSTOM_TYPE )
+		return;
+
 	$title_after = $post_after->post_title;
 	$slug_after = $post_after->post_name;
 	$title_before = $post_before->post_title;
@@ -110,12 +113,13 @@ add_action( 'post_updated', 'rhd_add_update_cpt_post', 10, 3 );
  */
 function rhd_delete_cpt_post( $post_id )
 {
-	if ( get_post_type( $post_id ) == RHD_LU_CUSTOM_TYPE ) {
-		$term_id = get_post_meta( $post_id, '_lu_' . RHD_LU_TAX . '_id', true );
+	if ( get_post_type( $post_id ) != RHD_LU_CUSTOM_TYPE )
+		return
 
-		if ( $term_id ) {
-			wp_delete_term( $term_id, RHD_LU_TAX );
-		}
+	$term_id = get_post_meta( $post_id, '_lu_' . RHD_LU_TAX . '_id', true );
+
+	if ( $term_id ) {
+		wp_delete_term( $term_id, RHD_LU_TAX );
 	}
 }
 add_action( 'before_delete_post', 'rhd_delete_cpt_post' );
@@ -134,7 +138,10 @@ add_action( 'delete_post', 'rhd_delete_cpt_post' );
  */
 function rhd_force_slug_update( $data, $postarr )
 {
-	if ( ! in_array( $data['post_status'], array( 'draft', 'pending', 'auto-draft' ) ) && $data['post_type'] == RHD_LU_CUSTOM_TYPE ) {
+	if ( $data['post_type'] != RHD_LU_CUSTOM_TYPE )
+		return;
+
+	if ( ! in_array( $data['post_status'], array( 'draft', 'pending', 'auto-draft' ) ) ) {
 		$data['post_name'] = sanitize_title( $data['post_title'] );
 	}
 
